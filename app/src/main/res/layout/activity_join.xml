@@ -73,10 +73,10 @@
                     android:layout_margin="10dp">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/name"
+                        android:id="@+id/nickname"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="이름" />
+                        android:hint="닉네임" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -99,7 +99,7 @@
                     android:layout_margin="10dp">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/sex"
+                        android:id="@+id/gender"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="성별" />
@@ -112,7 +112,7 @@
                     android:layout_margin="10dp">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/region"
+                        android:id="@+id/city"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="지역" />

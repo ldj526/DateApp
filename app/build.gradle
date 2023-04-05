@@ -46,6 +46,8 @@ dependencies {
 
     // Firebase Auth
     implementation 'com.google.firebase:firebase-auth-ktx'
+    // Firebase realtime database
+    implementation 'com.google.firebase:firebase-database-ktx'
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
