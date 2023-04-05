@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    // Add the Google services Gradle plugin
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -38,6 +40,12 @@ android {
 dependencies {
     // CardStackView
     implementation "com.yuyakaido.android:card-stack-view:2.3.4"
+    // Import the Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:31.3.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
+    // Firebase Auth
+    implementation 'com.google.firebase:firebase-auth-ktx'
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
