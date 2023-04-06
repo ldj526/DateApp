@@ -1,13 +1,21 @@
 package com.example.dateapp
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.example.dateapp.auth.UserDataModel
 import com.example.dateapp.setting.SettingActivity
 import com.example.dateapp.slider.CardStackAdapter
@@ -16,8 +24,6 @@ import com.example.dateapp.utils.FirebaseRef
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.CardStackView
@@ -60,10 +66,6 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, usersDataList[userCount].uid.toString())
 
                     userLike(uid, usersDataList[userCount].uid.toString())
-                }
-
-                if (direction == Direction.Left) {
-
                 }
                 userCount += 1
 
@@ -156,6 +158,8 @@ class MainActivity : AppCompatActivity() {
                     val likeUserKey = dataModel.key.toString()
                     if (likeUserKey.equals(uid)) {
                         Toast.makeText(this@MainActivity, "매칭 완료", Toast.LENGTH_LONG).show()
+                        createNotificationChannel()
+                        sendNotification()
                     }
                 }
             }
@@ -165,5 +169,50 @@ class MainActivity : AppCompatActivity() {
             }
         }
         FirebaseRef.userLikeRef.child(otherUid).addValueEventListener(postListener)
+    }
+
+    // 알림 채널 만들기
+    private fun createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "name"
+            val descriptionText = "description"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel("test_channel", name, importance).apply {
+                description = descriptionText
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    // 알림 콘텐츠 생성
+    private fun sendNotification(){
+        var builder = NotificationCompat.Builder(this, "test_channel")
+            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setContentTitle("매칭완료")
+            .setContentText("매칭이 완료되었습니다.")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+        with(NotificationManagerCompat.from(this)){
+            if (ActivityCompat.checkSelfPermission(
+                    baseContext,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return
+            }
+            notify(1, builder.build())
+        }
     }
 }
