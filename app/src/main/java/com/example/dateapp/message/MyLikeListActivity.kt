@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -15,13 +16,13 @@ import com.example.dateapp.message.fcm.PushNotification
 import com.example.dateapp.message.fcm.RetrofitInstance
 import com.example.dateapp.utils.FirebaseAuthUtils
 import com.example.dateapp.utils.FirebaseRef
+import com.example.dateapp.utils.MyInfo
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.newFixedThreadPoolContext
 
 class MyLikeListActivity : AppCompatActivity() {
 
@@ -32,6 +33,7 @@ class MyLikeListActivity : AppCompatActivity() {
     private val likeUserList = mutableListOf<UserDataModel>()
 
     lateinit var listViewAdapter: ListViewAdapter
+    lateinit var getterUid: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +57,7 @@ class MyLikeListActivity : AppCompatActivity() {
         // LongClick
         userListView.setOnItemLongClickListener { parent, view, position, id ->
             checkMatching(likeUserList[position].uid.toString())
+            getterUid = likeUserList[position].uid.toString()
             return@setOnItemLongClickListener (true)
         }
     }
@@ -139,7 +142,7 @@ class MyLikeListActivity : AppCompatActivity() {
     }
 
     // Dialog
-    private fun showDialog(){
+    private fun showDialog() {
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog, null)
         val mBuilder = AlertDialog.Builder(this)
             .setView(mDialogView)
@@ -148,7 +151,11 @@ class MyLikeListActivity : AppCompatActivity() {
         val mAlertDialog = mBuilder.show()
 
         val sendBtn = mAlertDialog.findViewById<Button>(R.id.sendTextBtn)
+        val textArea = mAlertDialog.findViewById<EditText>(R.id.sendTextArea)
+
         sendBtn?.setOnClickListener {
+            val messageModel = MessageModel(MyInfo.myNickname, textArea!!.text.toString())
+            FirebaseRef.userMessageRef.child(getterUid).push().setValue(messageModel)
             mAlertDialog.dismiss()
         }
     }
