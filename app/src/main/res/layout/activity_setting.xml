@@ -20,5 +20,11 @@
             android:layout_height="wrap_content"
             android:text="로그아웃" />
 
+        <Button
+            android:id="@+id/myMatchingListBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="매칭된 목록" />
+
     </LinearLayout>
 </layout>
