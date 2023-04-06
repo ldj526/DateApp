@@ -16,15 +16,17 @@
             android:src="@drawable/no" />
 
         <TextView
+            android:id="@+id/itemNickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="NAME"
+            android:text="NICKNAME"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/itemAge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -34,10 +36,11 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/itemCity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="REGION"
+            android:text="CITY"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />

@@ -3,12 +3,18 @@ package com.example.dateapp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import com.example.dateapp.auth.IntroActivity
+import com.example.dateapp.auth.UserDataModel
 import com.example.dateapp.slider.CardStackAdapter
+import com.example.dateapp.utils.FirebaseRef
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
@@ -19,6 +25,8 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var cardStackAdapter: CardStackAdapter
     lateinit var cardStackLayoutManager: CardStackLayoutManager
+
+    private val usersDataList = mutableListOf<UserDataModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,13 +71,27 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        val testList = mutableListOf<String>()
-        testList.add("a")
-        testList.add("b")
-        testList.add("c")
-
-        cardStackAdapter = CardStackAdapter(baseContext, testList)
+        cardStackAdapter = CardStackAdapter(baseContext, usersDataList)
         cardStackView.layoutManager = cardStackLayoutManager
         cardStackView.adapter = cardStackAdapter
+
+        getUserDataList()
+    }
+
+    private fun getUserDataList() {
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (dataModel in dataSnapshot.children) {
+                    val user = dataModel.getValue(UserDataModel::class.java)
+                    usersDataList.add(user!!)
+                }
+                cardStackAdapter.notifyDataSetChanged()
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+
+            }
+        }
+        FirebaseRef.userInfoRef.addValueEventListener(postListener)
     }
 }
