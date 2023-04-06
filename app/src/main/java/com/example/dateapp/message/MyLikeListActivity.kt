@@ -48,27 +48,38 @@ class MyLikeListActivity : AppCompatActivity() {
             val pushModel = PushNotification(notiModel, likeUserList[position].token.toString())
             testPush(pushModel)
         }
+
+        // LongClick
+        userListView.setOnItemLongClickListener { parent, view, position, id ->
+            checkMatching(likeUserList[position].uid.toString())
+            return@setOnItemLongClickListener (true)
+        }
     }
 
     private fun checkMatching(otherUid: String) {
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                var check = false
-                for (dataModel in dataSnapshot.children) {
-                    val likeUserKey = dataModel.key.toString()
-                    if (likeUserKey.equals(uid)) {
-                        Toast.makeText(this@MyLikeListActivity, "매칭이 되었습니다.", Toast.LENGTH_LONG)
-                            .show()
-                        check = true
-                        break
-                    }
-                }
-                if (!check) {
+                if (dataSnapshot.children.count() == 0) {
                     Toast.makeText(
                         this@MyLikeListActivity,
-                        "매칭이 되지 않았습니다.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        "상대방이 좋아요 한 사람이 없습니다.",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                } else {
+                    for (dataModel in dataSnapshot.children) {
+                        val likeUserKey = dataModel.key.toString()
+                        if (likeUserKey.equals(uid)) {
+                            Toast.makeText(
+                                this@MyLikeListActivity,
+                                "매칭이 되었습니다.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            break
+                        } else {
+
+                        }
+                    }
                 }
             }
 
