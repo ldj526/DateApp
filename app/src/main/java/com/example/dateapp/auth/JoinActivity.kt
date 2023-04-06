@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
@@ -14,9 +15,11 @@ import com.example.dateapp.MainActivity
 import com.example.dateapp.R
 import com.example.dateapp.databinding.ActivityJoinBinding
 import com.example.dateapp.utils.FirebaseRef
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
 
@@ -70,26 +73,43 @@ class JoinActivity : AppCompatActivity() {
             )
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-
                         val user = auth.currentUser
                         uid = user?.uid.toString()
 
-                        val userModel = UserDataModel(uid, nickname, age, gender, city)
+                        // Token
+                        FirebaseMessaging.getInstance().token.addOnCompleteListener(
+                            OnCompleteListener { task ->
+                                if (!task.isSuccessful) {
+                                    Log.w(
+                                        TAG,
+                                        "Fetching FCM registration token failed",
+                                        task.exception
+                                    )
+                                    return@OnCompleteListener
+                                }
 
-                        FirebaseRef.userInfoRef.child(uid).setValue(userModel)
+                                // Get new FCM registration token
+                                val token = task.result
 
-                        uploadImage(uid)
+                                Log.d(TAG, token.toString())
+                                val userModel = UserDataModel(uid, nickname, age, gender, city, token)
 
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
+                                FirebaseRef.userInfoRef.child(uid).setValue(userModel)
+
+                                uploadImage(uid)
+
+                                val intent = Intent(this, MainActivity::class.java)
+                                startActivity(intent)
+                            })
                     } else {
 
                     }
                 }
         }
     }
+
     // 이미지를 Firebase storage 에 업로드
-    private fun uploadImage(uid: String){
+    private fun uploadImage(uid: String) {
         // Firebase storage 연결
         val storage = Firebase.storage
         val storageRef = storage.reference.child(uid + ".png")
