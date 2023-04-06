@@ -32,11 +32,14 @@ class FirebaseService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        Log.e(TAG, message.notification?.title.toString())
-        Log.e(TAG, message.notification?.body.toString())
+//        Log.e(TAG, message.notification?.title.toString())
+//        Log.e(TAG, message.notification?.body.toString())
+//
+//        val title = message.notification?.title.toString()
+//        val body = message.notification?.body.toString()
 
-        val title = message.notification?.title.toString()
-        val body = message.notification?.body.toString()
+        val title = message.data["title"].toString()
+        val body = message.data["content"].toString()
 
         createNotificationChannel()
         // Firebase Service를 앱에서 메세지 받아서 알람을 띄워줌
