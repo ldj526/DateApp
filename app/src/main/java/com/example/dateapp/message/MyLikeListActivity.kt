@@ -3,6 +3,7 @@ package com.example.dateapp.message
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.ListView
 import android.widget.Toast
 import com.example.dateapp.R
 import com.example.dateapp.auth.UserDataModel
@@ -20,9 +21,16 @@ class MyLikeListActivity : AppCompatActivity() {
     private val likeUserListUid = mutableListOf<String>()
     private val likeUserList = mutableListOf<UserDataModel>()
 
+    lateinit var listViewAdapter: ListViewAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_like_list)
+
+        val userListView = findViewById<ListView>(R.id.userListView)
+
+        listViewAdapter = ListViewAdapter(this, likeUserList)
+        userListView.adapter = listViewAdapter
 
         getUserDataList()
 
@@ -58,6 +66,7 @@ class MyLikeListActivity : AppCompatActivity() {
                         likeUserList.add(user!!)
                     }
                 }
+                listViewAdapter.notifyDataSetChanged()
                 Log.d(TAG, likeUserList.toString())
             }
             override fun onCancelled(databaseError: DatabaseError) {
