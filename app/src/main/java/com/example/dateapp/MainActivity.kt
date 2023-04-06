@@ -7,13 +7,17 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.example.dateapp.auth.UserDataModel
 import com.example.dateapp.setting.SettingActivity
 import com.example.dateapp.slider.CardStackAdapter
+import com.example.dateapp.utils.FirebaseAuthUtils
 import com.example.dateapp.utils.FirebaseRef
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.CardStackView
@@ -29,6 +33,10 @@ class MainActivity : AppCompatActivity() {
     private val TAG = MainActivity::class.java.simpleName
 
     private var userCount = 0
+
+    private lateinit var currentUserGender: String
+
+    private val uid = FirebaseAuthUtils.getUid()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,8 +65,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 userCount += 1
 
-                if(userCount == usersDataList.count()){
-                    getUserDataList()
+                if (userCount == usersDataList.count()) {
+                    getUserDataList(currentUserGender)
                     Toast.makeText(this@MainActivity, "유저를 새롭게 받아 옴.", Toast.LENGTH_LONG).show()
                 }
             }
@@ -85,15 +93,41 @@ class MainActivity : AppCompatActivity() {
         cardStackView.layoutManager = cardStackLayoutManager
         cardStackView.adapter = cardStackAdapter
 
-        getUserDataList()
+
+        getMyUserData()
     }
 
-    private fun getUserDataList() {
+    private fun getMyUserData() {
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                Log.d(TAG, dataSnapshot.toString())
+                val data = dataSnapshot.getValue(UserDataModel::class.java)
+
+                Log.d(TAG, data?.gender.toString())
+
+                currentUserGender = data?.gender.toString()
+
+                getUserDataList(currentUserGender)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(TAG, "loadPost:onCanceled", databaseError.toException())
+            }
+        }
+        FirebaseRef.userInfoRef.child(uid).addValueEventListener(postListener)
+    }
+
+    private fun getUserDataList(currentUserGender: String) {
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (dataModel in dataSnapshot.children) {
                     val user = dataModel.getValue(UserDataModel::class.java)
-                    usersDataList.add(user!!)
+
+                    if (user!!.gender.toString().equals(currentUserGender)) {
+
+                    } else {
+                        usersDataList.add(user!!)
+                    }
                 }
                 cardStackAdapter.notifyDataSetChanged()
             }
