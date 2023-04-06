@@ -2,8 +2,11 @@ package com.example.dateapp.message
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.Button
 import android.widget.ListView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dateapp.R
 import com.example.dateapp.auth.UserDataModel
@@ -75,7 +78,7 @@ class MyLikeListActivity : AppCompatActivity() {
                                 "매칭이 되었습니다.",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            break
+                            showDialog()
                         } else {
 
                         }
@@ -133,5 +136,20 @@ class MyLikeListActivity : AppCompatActivity() {
     // Push
     private fun testPush(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
         RetrofitInstance.api.postNotification(notification)
+    }
+
+    // Dialog
+    private fun showDialog(){
+        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog, null)
+        val mBuilder = AlertDialog.Builder(this)
+            .setView(mDialogView)
+            .setTitle("메세지 보내기")
+
+        val mAlertDialog = mBuilder.show()
+
+        val sendBtn = mAlertDialog.findViewById<Button>(R.id.sendTextBtn)
+        sendBtn?.setOnClickListener {
+            mAlertDialog.dismiss()
+        }
     }
 }
