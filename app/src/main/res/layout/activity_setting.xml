@@ -26,5 +26,11 @@
             android:layout_height="wrap_content"
             android:text="매칭된 목록" />
 
+        <Button
+            android:id="@+id/myMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="내가 받은 메세지" />
+
     </LinearLayout>
 </layout>

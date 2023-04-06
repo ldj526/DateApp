@@ -46,14 +46,6 @@ class MyLikeListActivity : AppCompatActivity() {
 
         getMyLikeList()
 
-        userListView.setOnItemClickListener { parent, view, position, id ->
-            checkMatching(likeUserList[position].uid.toString())
-
-            val notiModel = NotificationModel("a", "b")
-            val pushModel = PushNotification(notiModel, likeUserList[position].token.toString())
-            testPush(pushModel)
-        }
-
         // LongClick
         userListView.setOnItemLongClickListener { parent, view, position, id ->
             checkMatching(likeUserList[position].uid.toString())
