@@ -1,10 +1,10 @@
 package com.example.dateapp.message
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ListView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.dateapp.R
 import com.example.dateapp.auth.UserDataModel
 import com.example.dateapp.utils.FirebaseAuthUtils
@@ -32,9 +32,40 @@ class MyLikeListActivity : AppCompatActivity() {
         listViewAdapter = ListViewAdapter(this, likeUserList)
         userListView.adapter = listViewAdapter
 
-        getUserDataList()
-
         getMyLikeList()
+
+        userListView.setOnItemClickListener { parent, view, position, id ->
+            checkMatching(likeUserList[position].uid.toString())
+        }
+    }
+
+    private fun checkMatching(otherUid: String) {
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                var check = false
+                for (dataModel in dataSnapshot.children) {
+                    val likeUserKey = dataModel.key.toString()
+                    if (likeUserKey.equals(uid)) {
+                        Toast.makeText(this@MyLikeListActivity, "매칭이 되었습니다.", Toast.LENGTH_LONG)
+                            .show()
+                        check = true
+                        break
+                    }
+                }
+                if (!check) {
+                    Toast.makeText(
+                        this@MyLikeListActivity,
+                        "매칭이 되지 않았습니다.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(TAG, "loadPost:onCanceled", databaseError.toException())
+            }
+        }
+        FirebaseRef.userLikeRef.child(otherUid).addValueEventListener(postListener)
     }
 
     // 내가 좋아요 한 목록
@@ -42,7 +73,7 @@ class MyLikeListActivity : AppCompatActivity() {
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (dataModel in dataSnapshot.children) {
-                    // 좋아요 한 사람들의 목록을 likeUserListUid에 넣어준다.
+                    // 좋아요 한 사람들의 uid를 likeUserListUid에 넣어준다.
                     likeUserListUid.add(dataModel.key.toString())
                 }
                 getUserDataList()
@@ -61,7 +92,7 @@ class MyLikeListActivity : AppCompatActivity() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (dataModel in dataSnapshot.children) {
                     val user = dataModel.getValue(UserDataModel::class.java)
-                    // 사용자가 좋아요한 사람이 사용자를 좋아요 했으면 likeUserList에 추가해준다.
+                    // 전체 유저 중 사용자가 좋아요 한 사람들의 정보만 추가
                     if (likeUserListUid.contains(user?.uid)) {
                         likeUserList.add(user!!)
                     }
@@ -69,6 +100,7 @@ class MyLikeListActivity : AppCompatActivity() {
                 listViewAdapter.notifyDataSetChanged()
                 Log.d(TAG, likeUserList.toString())
             }
+
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.w(TAG, "loadPost:onCanceled", databaseError.toException())
             }
