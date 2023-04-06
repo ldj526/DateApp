@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import com.example.dateapp.auth.IntroActivity
 import com.example.dateapp.auth.UserDataModel
+import com.example.dateapp.setting.SettingActivity
 import com.example.dateapp.slider.CardStackAdapter
 import com.example.dateapp.utils.FirebaseRef
 import com.google.firebase.auth.ktx.auth
@@ -28,17 +29,15 @@ class MainActivity : AppCompatActivity() {
 
     private val usersDataList = mutableListOf<UserDataModel>()
 
+    private val TAG = MainActivity::class.java.simpleName
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val setting = findViewById<ImageView>(R.id.settingIcon)
         setting.setOnClickListener {
-            Toast.makeText(this, "클릭", Toast.LENGTH_LONG).show()
-            val auth = Firebase.auth
-            auth.signOut()
-
-            val intent = Intent(this, IntroActivity::class.java)
+            val intent = Intent(this, SettingActivity::class.java)
             startActivity(intent)
         }
 
@@ -89,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-
+                Log.w(TAG, "loadPost:onCanceled", databaseError.toException())
             }
         }
         FirebaseRef.userInfoRef.addValueEventListener(postListener)

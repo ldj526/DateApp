@@ -8,7 +8,7 @@ class FirebaseAuthUtils {
 
         fun getUid(): String {
             auth = FirebaseAuth.getInstance()
-            return auth.currentUser.toString()
+            return auth.currentUser?.uid.toString()
         }
     }
 }
