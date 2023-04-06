@@ -4,10 +4,15 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.dateapp.R
 import com.example.dateapp.auth.UserDataModel
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 
 class CardStackAdapter(val context: Context, val items: List<UserDataModel>) :
     RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
@@ -24,10 +29,22 @@ class CardStackAdapter(val context: Context, val items: List<UserDataModel>) :
     override fun getItemCount(): Int = items.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val image = itemView.findViewById<ImageView>(R.id.profileImageArea)
         val nickname = itemView.findViewById<TextView>(R.id.itemNickname)
         val age = itemView.findViewById<TextView>(R.id.itemAge)
         val city = itemView.findViewById<TextView>(R.id.itemCity)
         fun bind(data: UserDataModel) {
+
+            // Firebase storage 에 있는 이미지를 불러오기
+            val storageRef = Firebase.storage.reference.child(data.uid+".png")
+            storageRef.downloadUrl.addOnCompleteListener(OnCompleteListener { task ->
+                if(task.isSuccessful){
+                    Glide.with(context)
+                        .load(task.result)
+                        .into(image)
+                }
+            })
+
             nickname.text = data.nickname
             age.text = data.age
             city.text = data.city
