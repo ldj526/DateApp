@@ -57,14 +57,13 @@ class MainActivity : AppCompatActivity() {
 
             override fun onCardSwiped(direction: Direction?) {
                 if (direction == Direction.Right) {
-                    Toast.makeText(this@MainActivity, "right", Toast.LENGTH_SHORT).show()
                     Log.d(TAG, usersDataList[userCount].uid.toString())
 
                     userLike(uid, usersDataList[userCount].uid.toString())
                 }
 
                 if (direction == Direction.Left) {
-                    Toast.makeText(this@MainActivity, "left", Toast.LENGTH_SHORT).show()
+
                 }
                 userCount += 1
 
@@ -145,5 +144,26 @@ class MainActivity : AppCompatActivity() {
     // 사용자가 '좋아요' 를 나타내는 것
     private fun userLike(myUid: String, otherUid: String) {
         FirebaseRef.userLikeRef.child(myUid).child(otherUid).setValue("true")
+        getOtherUserLikeList(otherUid)
+    }
+
+    // 사용자가 좋아요한 사람이 누구를 좋아요 했는지 확인
+    private fun getOtherUserLikeList(otherUid: String) {
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // 리스트에서 사용자의 UID가 있는지 확인한다.
+                for (dataModel in dataSnapshot.children) {
+                    val likeUserKey = dataModel.key.toString()
+                    if (likeUserKey.equals(uid)) {
+                        Toast.makeText(this@MainActivity, "매칭 완료", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(TAG, "loadPost:onCanceled", databaseError.toException())
+            }
+        }
+        FirebaseRef.userLikeRef.child(otherUid).addValueEventListener(postListener)
     }
 }
