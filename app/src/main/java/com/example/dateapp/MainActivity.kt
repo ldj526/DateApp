@@ -1,22 +1,19 @@
 package com.example.dateapp
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
-import com.example.dateapp.auth.IntroActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.example.dateapp.auth.UserDataModel
 import com.example.dateapp.setting.SettingActivity
 import com.example.dateapp.slider.CardStackAdapter
 import com.example.dateapp.utils.FirebaseRef
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.ktx.Firebase
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.CardStackView
@@ -30,6 +27,8 @@ class MainActivity : AppCompatActivity() {
     private val usersDataList = mutableListOf<UserDataModel>()
 
     private val TAG = MainActivity::class.java.simpleName
+
+    private var userCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +48,19 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCardSwiped(direction: Direction?) {
+                if (direction == Direction.Right) {
+                    Toast.makeText(this@MainActivity, "right", Toast.LENGTH_SHORT).show()
+                }
 
+                if (direction == Direction.Left) {
+                    Toast.makeText(this@MainActivity, "left", Toast.LENGTH_SHORT).show()
+                }
+                userCount += 1
+
+                if(userCount == usersDataList.count()){
+                    getUserDataList()
+                    Toast.makeText(this@MainActivity, "유저를 새롭게 받아 옴.", Toast.LENGTH_LONG).show()
+                }
             }
 
             override fun onCardRewound() {
