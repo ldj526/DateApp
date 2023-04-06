@@ -8,5 +8,6 @@ class FirebaseRef {
         // Firebase 의 유저 정보 가져오기
         val database = Firebase.database
         val userInfoRef = database.getReference("userInfo")
+        val userLikeRef = database.getReference("userLike")
     }
 }

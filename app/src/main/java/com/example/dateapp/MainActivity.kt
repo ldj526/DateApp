@@ -58,6 +58,9 @@ class MainActivity : AppCompatActivity() {
             override fun onCardSwiped(direction: Direction?) {
                 if (direction == Direction.Right) {
                     Toast.makeText(this@MainActivity, "right", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, usersDataList[userCount].uid.toString())
+
+                    userLike(uid, usersDataList[userCount].uid.toString())
                 }
 
                 if (direction == Direction.Left) {
@@ -137,5 +140,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
         FirebaseRef.userInfoRef.addValueEventListener(postListener)
+    }
+
+    // 사용자가 '좋아요' 를 나타내는 것
+    private fun userLike(myUid: String, otherUid: String) {
+        FirebaseRef.userLikeRef.child(myUid).child(otherUid).setValue("true")
     }
 }
